@@ -2,7 +2,7 @@
 
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createStorage, http } from "wagmi";
 import { mainnet, sepolia } from "wagmi/chains";
 import { env } from "~/env";
 
@@ -10,7 +10,7 @@ import { env } from "~/env";
 const metadata = {
   name: "test-project",
   description: "AppKit Example",
-  url: "http://localhost:3000/", // origin must match your domain & subdomain
+  url: "https://localhost:3000/", // origin must match your domain & subdomain
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
@@ -18,6 +18,7 @@ const metadata = {
 const chains = [mainnet, sepolia] as const;
 export const wagmiConfig = defaultWagmiConfig({
   chains,
+  transports: { [mainnet.id]: http(), [sepolia.id]: http() },
   projectId: env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   metadata,
   ssr: true,

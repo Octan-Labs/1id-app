@@ -1,4 +1,4 @@
-import { getCsrfToken, signIn, signOut, getSession } from "next-auth/react";
+import { getCsrfToken, getSession, signIn, signOut } from "next-auth/react";
 import type {
   SIWEVerifyMessageArgs,
   SIWECreateMessageArgs,
@@ -25,14 +25,19 @@ export const siweConfig = createSIWEConfig({
     return nonce;
   },
   getSession: async () => {
-    const session = await getSession();
-    if (!session) {
-      throw new Error("Failed to get session!");
+    try {
+      const session = await getSession();
+      if (!session) {
+        throw new Error("Failed to get session!");
+      }
+
+      const { address, chainId } = session as unknown as SIWESession;
+
+      return { address, chainId };
+    } catch (error) {
+      console.error("getSession error: ", error);
+      return null;
     }
-
-    const { address, chainId } = session as unknown as SIWESession;
-
-    return { address, chainId };
   },
   verifyMessage: async ({ message, signature }: SIWEVerifyMessageArgs) => {
     try {
@@ -40,11 +45,12 @@ export const siweConfig = createSIWEConfig({
         message,
         redirect: false,
         signature,
-        callbackUrl: "",
+        callbackUrl: "/",
       });
 
       return Boolean(success?.ok);
     } catch (error) {
+      console.error("signIn error: ", error);
       return false;
     }
   },
