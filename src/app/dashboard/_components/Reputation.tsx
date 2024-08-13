@@ -35,7 +35,9 @@ export const Reputation = () => {
           <Label>Wallet List</Label>
           {walletList.map((wallet, index) => (
             <div key={index} className="flex w-full items-center">
-              <Button variant="outline">{wallet.address}</Button>
+              <Button className="w-full justify-start" variant="outline">
+                {wallet.address}
+              </Button>
             </div>
           ))}
         </div>
@@ -245,7 +247,7 @@ const Rewards = () => {
               </Button>
             </CardContent>
           </Card>
-          <Card className="w-full rounded py-4 pb-0 bg-slate-300">
+          <Card className="w-full rounded bg-slate-300 py-4 pb-0">
             <CardContent className="grid gap-2">
               <div className="flex justify-between">
                 <Badge
@@ -266,7 +268,7 @@ const Rewards = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="w-full rounded py-4 pb-0 bg-slate-300">
+          <Card className="w-full rounded bg-slate-300 py-4 pb-0">
             <CardContent className="grid gap-2">
               <div className="flex justify-between">
                 <Badge
