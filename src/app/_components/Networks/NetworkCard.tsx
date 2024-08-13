@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -10,6 +11,8 @@ import { middleEllipsis } from "../../../lib/stringUtils";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
 import { toPercent } from "~/lib/numberUtils";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 export interface NetworkCardProps {
   address: string;
@@ -76,8 +79,26 @@ export const NetworkCard = ({
         <span>
           <CountDownTimer endTime={endTime} />
         </span>
-        <Button className="rounded-none text-lg font-bold italic">Claim</Button>
+        <ClaimButton />
       </CardFooter>
     </Card>
+  );
+};
+
+const ClaimButton = () => {
+  const session = useSession();
+  const { open, close } = useWeb3Modal();
+  console.log(session);
+  return (
+    <Button
+      onClick={() => {
+        if (session.status === "unauthenticated") {
+          open();
+        }
+      }}
+      className="rounded-none text-lg font-bold italic"
+    >
+      Claim
+    </Button>
   );
 };

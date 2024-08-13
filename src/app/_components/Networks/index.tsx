@@ -2,6 +2,7 @@
 import { Button } from "~/components/ui/button";
 import { ChainFilter } from "./ChainFilter";
 import { NetworkCard, NetworkCardProps } from "./NetworkCard";
+import { SessionProvider } from "next-auth/react";
 
 const networks: NetworkCardProps[] = [
   {
@@ -61,9 +62,11 @@ export const Networks = () => {
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {networks.map((network) => (
-          <NetworkCard key={network.address} {...network} />
-        ))}
+        <SessionProvider>
+          {networks.map((network) => (
+            <NetworkCard key={network.address} {...network} />
+          ))}
+        </SessionProvider>
       </div>
     </div>
   );
