@@ -1,26 +1,21 @@
 "use client";
-
 import { useWalletInfo } from "@web3modal/wagmi/react";
-import { useAccount } from "wagmi";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
 export const Profile = () => {
-  const account = useAccount();
   const { walletInfo } = useWalletInfo();
   return (
     <div className="grid gap-4">
-      <div>
+      <div suppressHydrationWarning>
         <img
           className="h-8 w-8 rounded-full border bg-secondary"
           src={walletInfo?.icon}
           alt=""
         />
-        <div>
-          <h2>{walletInfo?.name}</h2>
-        </div>
+        <span>{walletInfo?.name}</span>
         <Badge variant="outline">
           Refferal link:&nbsp;
           <span className="select-all font-semibold text-blue-500 hover:cursor-copy hover:underline">
@@ -61,7 +56,10 @@ export const Profile = () => {
               <img src="img/icon/telegramColor.svg" alt="" />
             </Button>
           </div>
-          <Button className="rounded-none text-xl font-semibold" variant="primary-active">
+          <Button
+            className="rounded-none text-xl font-semibold"
+            variant="primary-active"
+          >
             Send a code
           </Button>
         </div>

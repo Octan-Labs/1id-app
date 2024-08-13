@@ -9,7 +9,7 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       <main className="flex justify-center px-6 py-14 text-text md:px-24">
         <div className="w-full max-w-screen-2xl">{children}</div>
       </main>
-      <Footer className="self-end mt-auto"/>
+      <Footer className="mt-auto"/>
     </div>
   );
 };

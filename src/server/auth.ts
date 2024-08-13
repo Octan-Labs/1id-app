@@ -11,6 +11,8 @@ import { type Adapter } from "next-auth/adapters";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
+import { wallets } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -57,7 +59,6 @@ export const authOptions: NextAuthOptions = {
         session.address = address;
         session.chainId = parseInt(chainId, 10);
       }
-
       return session;
     },
   },
@@ -88,6 +89,9 @@ export const authOptions: NextAuthOptions = {
           const address = getAddressFromMessage(message);
           const chainId = getChainIdFromMessage(message);
 
+          console.log("address", address);
+          console.log("chainId", chainId);
+
           const isValid = await verifySignature({
             address,
             message,
@@ -97,6 +101,21 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (isValid) {
+            const existingWallet = await db.query.wallets.findFirst({
+              where: eq(wallets.address, address),
+            });
+
+            console.log("existingWallet", existingWallet);
+
+            if (!existingWallet) {
+              const newWallet: typeof wallets.$inferInsert = {
+                address,
+                chainId,
+              };
+              console.log("newWallet", newWallet);
+              await db.insert(wallets).values(newWallet);
+            }
+
             return {
               id: `${chainId}:${address}`,
             };

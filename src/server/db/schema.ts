@@ -1,15 +1,14 @@
 import { relations, sql } from "drizzle-orm";
 import {
   index,
-  integer,
   pgTableCreator,
   primaryKey,
   serial,
-  text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import { type AdapterAccount } from "next-auth/adapters";
+import { v7 as uuidv7 } from "uuid";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -19,87 +18,70 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `1id_${name}`);
 
-export const wallets = createTable("wallet", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
-  chainId: integer("chain_id").notNull(),
-  address: varchar("address", { length: 255 }).notNull(),
-});
-
-export const users = createTable("user", {
-  id: varchar("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("email_verified", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: varchar("image", { length: 255 }),
-});
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
-
-export const accounts = createTable(
-  "account",
+export const wallets = createTable(
+  "wallet",
   {
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("provider_account_id", {
-      length: 255,
-    }).notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
+    id: varchar("id", { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    address: varchar("address", { length: 255 }).notNull().unique(),
+    userId: varchar("user_id", { length: 36 }).references(() => users.id),
+    chainId: varchar("chain_id", { length: 255 }).notNull(),
   },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-    userIdIdx: index("account_user_id_idx").on(account.userId),
+  (table) => ({
+    nameIdx: index("wallet_userId_idx").on(table.userId),
+    addressIdx: uniqueIndex("wallet_address_idx").on(table.address),
   }),
 );
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
+export const walletRelations = relations(wallets, ({ one }) => ({
+  user: one(users, {
+    fields: [wallets.userId],
+    references: [users.id],
+  }),
 }));
 
-export const sessions = createTable(
-  "session",
+export const users = createTable(
+  "user",
   {
-    sessionToken: varchar("session_token", { length: 255 })
-      .notNull()
-      .primaryKey(),
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    expires: timestamp("expires", {
+    id: varchar("id", { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    emailVerified: timestamp("email_verified", {
       mode: "date",
       withTimezone: true,
-    }).notNull(),
+    }).default(sql`CURRENT_TIMESTAMP`),
+    image: varchar("image", { length: 255 }),
   },
-  (session) => ({
-    userIdIdx: index("session_user_id_idx").on(session.userId),
+  (table) => ({
+    emailIdx: uniqueIndex("user_email_idx").on(table.email),
   }),
 );
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+export const userRelations = relations(users, ({ one, many }) => ({
+  userProfile: one(userProfiles),
+  userWallets: many(wallets),
+}));
+
+export const userProfiles = createTable(
+  "user_profile",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id", { length: 36 })
+      .references(() => users.id)
+      .unique(),
+  },
+  (table) => ({
+    userIdIdx: uniqueIndex("user_profile_userId_idx").on(table.userId),
+  }),
+);
+
+export const useProfileRelations = relations(userProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [userProfiles.userId],
+    references: [users.id],
+  }),
 }));
 
 export const verificationTokens = createTable(

@@ -1,11 +1,12 @@
-"use client";
-import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
+"use client"; import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
 import { useAccount } from "wagmi";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Profile } from "./_components/Profile";
+import { api } from "~/trpc/react";
 
 export default function Dashboard() {
   const account = useAccount();
+  const query = api.user.me.useQuery();
   return (
     <>
       {account.address ? (

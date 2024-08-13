@@ -36,7 +36,7 @@ const networks: NetworkCardProps[] = [
 export const Networks = () => {
   return (
     <div className="grid gap-2">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <ChainFilter />
         <Button
           className="rounded-full text-xl font-bold italic"
@@ -62,7 +62,7 @@ export const Networks = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {networks.map((network) => (
-          <NetworkCard {...network} />
+          <NetworkCard key={network.address} {...network} />
         ))}
       </div>
     </div>
