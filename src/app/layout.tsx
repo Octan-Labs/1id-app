@@ -121,7 +121,7 @@ export default function RootLayout({
           <TRPCReactProvider>
             <HydrateClient>
               <div className="font-semibold"></div>
-              <Layout>{children}</Layout>
+                <Layout>{children}</Layout>
             </HydrateClient>
           </TRPCReactProvider>
         </Web3ModalProvider>

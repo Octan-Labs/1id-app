@@ -1,15 +1,25 @@
-"use client"; import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
-import { useAccount } from "wagmi";
+"use client";
+import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Profile } from "./_components/Profile";
+import { SessionProvider, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
+import { Reputation } from "./_components/Reputation";
 
-export default function Dashboard() {
-  const account = useAccount();
-  const query = api.user.me.useQuery();
+export default function Page() {
+  return (
+    <SessionProvider>
+      <Dashboard />
+    </SessionProvider>
+  );
+}
+
+const Dashboard = () => {
+  const session = useSession();
+  const { data: me } = api.user.me.useQuery();
   return (
     <>
-      {account.address ? (
+      {session.status !== "unauthenticated" ? (
         <div>
           <div className="grid gap-6">
             <div className="flex flex-col gap-2">
@@ -22,7 +32,7 @@ export default function Dashboard() {
             </div>
             <div>
               <Tabs defaultValue="profile" className="w-full">
-                <TabsList>
+                <TabsList className="pb-8">
                   <TabsTrigger
                     className="px-8 text-lg font-bold"
                     value="profile"
@@ -43,10 +53,10 @@ export default function Dashboard() {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="profile">
-                  <Profile />
+                  <Profile me={me?.user} />
                 </TabsContent>
                 <TabsContent value="reputation">
-                  Change your password here.
+                  <Reputation />
                 </TabsContent>
                 <TabsContent value="community">asdsa</TabsContent>
               </Tabs>
@@ -58,4 +68,4 @@ export default function Dashboard() {
       )}
     </>
   );
-}
+};
