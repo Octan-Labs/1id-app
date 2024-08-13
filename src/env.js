@@ -33,6 +33,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string(),
+    NEXT_PUBLIC_DOMAIN: z.string(),
   },
 
   /**
@@ -44,6 +45,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
     // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,

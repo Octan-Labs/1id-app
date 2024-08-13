@@ -10,7 +10,7 @@ import { env } from "~/env";
 const metadata = {
   name: "test-project",
   description: "AppKit Example",
-  url: "https://localhost:3000/", // origin must match your domain & subdomain
+  url: env.NEXT_PUBLIC_DOMAIN,
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
