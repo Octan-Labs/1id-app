@@ -47,8 +47,16 @@ export const userRouter = createTRPCRouter({
           .set({
             userId: newUser.pop()?.insertedId,
           })
-          .where(eq(wallets.address, ctx.session.address));
+          .where(eq(wallets.address, ctx.session.address))
+          .execute();
+        return wallet;
       }
+
+      await ctx.db
+        .update(users)
+        .set({ email: input.email })
+        .where(eq(users.id, wallet.user.id))
+        .execute();
 
       return wallet;
     }),
