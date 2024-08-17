@@ -5,13 +5,13 @@ import type {
   SIWESession,
 } from "@web3modal/siwe";
 import { createSIWEConfig, formatMessage } from "@web3modal/siwe";
-import { mainnet, sepolia } from "viem/chains";
+import { bsc } from "viem/chains";
 
 export const siweConfig = createSIWEConfig({
   getMessageParams: async () => ({
     domain: typeof window !== "undefined" ? window.location.host : "",
     uri: typeof window !== "undefined" ? window.location.origin : "",
-    chains: [mainnet.id, sepolia.id],
+    chains: [bsc.id],
     statement: "Please sign with your account",
   }),
   createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>

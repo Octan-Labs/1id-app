@@ -6,7 +6,6 @@ import { users, wallets } from "~/server/db/schema";
 
 export const userRouter = createTRPCRouter({
   me: protectedProcedure.query(async ({ ctx }) => {
-    console.log("session", ctx.session);
     const wallet = await ctx.db.query.wallets.findFirst({
       where: eq(wallets.address, ctx.session?.address),
       with: {
@@ -60,7 +59,4 @@ export const userRouter = createTRPCRouter({
 
       return wallet;
     }),
-  // const user = await ctx.db.query.users.findFirst({
-  //   where: users
-  // })}),
 });

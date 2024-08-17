@@ -73,16 +73,16 @@ export const Header = () => {
               // if (!accountInfo.address) open();
               open();
             }}
-            variant={accountInfo.address ? "outline" : "default"}
+            variant={accountInfo.isConnected ? "outline" : "default"}
             className={cn(
               "text-foreground hover:text-foreground block max-w-56 truncate overflow-ellipsis rounded-none py-1 text-xl font-bold italic tracking-wide transition-colors",
-              accountInfo.address ? "bg-background" : "bg-secondary",
+              accountInfo.isConnected ? "bg-background" : "bg-secondary",
             )}
           >
             <img
               src={walletInfo.walletInfo?.icon ?? ""}
               alt=""
-              className={cn(accountInfo.address ?? "hidden")}
+              className={cn(accountInfo.isConnected ?? "hidden")}
             />
             {accountInfo.address ?? "Connect"}
           </Button>

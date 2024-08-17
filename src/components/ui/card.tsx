@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { cn } from "~/lib/utils";
 
-const cardVariants = cva("h-full border-black border-2 rounded-md bg-card", {
+const cardVariants = cva("h-full border-black border-2 rounded-md bg-card transition-all", {
   variants: {
     variant: {
       default: "hover:shadow-neo bg-white",

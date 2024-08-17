@@ -11,35 +11,65 @@ import { middleEllipsis } from "../../../lib/stringUtils";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
 import { toPercent } from "~/lib/numberUtils";
-import { SessionProvider, useSession } from "next-auth/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import Link from "next/link";
+import { SquareArrowOutUpRight } from "lucide-react";
+import { useAccount } from "wagmi";
+import { api } from "~/trpc/react";
 
 export interface NetworkCardProps {
+  campaignId: string;
   address: string;
   name: string;
-  logo: string;
-  endTime: Date;
-  totalStaked: number;
-  remainingRewards: number;
-  requirements: string[];
+  href: string;
+  logo?: string | null;
+  token?: string;
+  startTime?: Date | null;
+  endTime?: Date | null;
+  totalStaked?: number;
+  remainingRewards?: number;
+  requirements?: string[];
+  variant?: "default" | "tbd";
+  claimed: boolean;
 }
 
 export const NetworkCard = ({
+  campaignId,
   address,
   name,
+  href,
   logo,
+  token,
+  startTime,
   endTime,
   totalStaked,
-  remainingRewards,
   requirements,
+  claimed,
 }: NetworkCardProps) => {
+  const now = new Date();
+  const { mutate, isPending, isSuccess } =
+    api.campaign.whitelistWallet.useMutation();
+
+  const claimToken = () => {
+    mutate({ campaignId });
+  };
+
   return (
     <Card>
       <CardHeader className="flex-row items-start justify-between">
         <div className="flex items-start gap-4">
-          <img src={logo} className="h-10 w-10" alt="" />
+          <img src={logo ?? ""} className="h-10 w-10" alt="" />
           <div className="flex flex-col">
-            <span className="text-xl font-bold">{name}</span>
+            <div className="group inline-flex">
+              <Link
+                href={href}
+                target="_blank"
+                className="text-xl font-bold text-blue-600 group-hover:underline"
+              >
+                {name}
+              </Link>
+              <SquareArrowOutUpRight className="hidden h-3 min-h-3 w-3 min-w-3 text-blue-600 group-hover:flex" />
+            </div>
             <Badge variant="outline">{middleEllipsis(address, 12)}</Badge>
           </div>
         </div>
@@ -48,57 +78,115 @@ export const NetworkCard = ({
       <CardContent className="grid gap-4">
         <div>
           <Progress
-            value={toPercent(totalStaked - remainingRewards, totalStaked)}
+            value={
+              startTime && endTime
+                ? now > startTime
+                  ? now < endTime
+                    ? ((now.getTime() - startTime.getTime()) /
+                        (endTime.getTime() - startTime.getTime())) *
+                      100
+                    : 100
+                  : 0
+                : 0
+            }
           />
           <div className="flex justify-between">
             <div>
-              <span className="font-bold">{totalStaked}</span> OCTA (total)
-            </div>
-            <div>
-              <span className="font-bold">{remainingRewards}</span> OCTA left
+              {totalStaked ? (
+                <>
+                  <span className="font-bold">
+                    {totalStaked?.toLocaleString()}
+                  </span>{" "}
+                  {token} (total)
+                </>
+              ) : (
+                "TBD"
+              )}
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-2 font-semibold">
-          Require:
-          <ul className="flex flex-wrap gap-2">
-            {requirements.map((requirement) => (
-              <li key={requirement}>
-                <Badge
-                  className="border-lime-600 bg-primary text-base font-bold"
-                  variant="primary"
-                >
-                  {requirement}
-                </Badge>
-              </li>
-            ))}
-          </ul>
+          Require:{" "}
+          {requirements?.length ? (
+            <ul className="flex flex-wrap gap-2">
+              {requirements?.map((requirement) => (
+                <li key={requirement}>
+                  <Badge
+                    className="border-lime-600 bg-primary text-base font-bold"
+                    variant="primary"
+                  >
+                    {requirement}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            "TBD"
+          )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between gap-4">
         <span>
-          <CountDownTimer endTime={endTime} />
+          {startTime && endTime ? (
+            <CountDownTimer startTime={startTime} endTime={endTime} />
+          ) : (
+            <div className="text-lg font-bold">TBD</div>
+          )}
         </span>
-        <ClaimButton />
+        <ClaimButton
+          claimStatus={
+            isSuccess || claimed
+              ? "claimed"
+              : startTime && endTime
+                ? now < startTime
+                  ? "not started"
+                  : endTime < now
+                    ? "ended"
+                    : "started"
+                : "not started"
+          }
+          isPending={isPending}
+          onClick={claimToken}
+        />
       </CardFooter>
     </Card>
   );
 };
 
-const ClaimButton = () => {
-  const session = useSession();
-  const { open, close } = useWeb3Modal();
-  console.log(session);
+const ClaimButton = ({
+  claimStatus,
+  onClick,
+  isPending,
+}: {
+  claimStatus: "not started" | "started" | "ended" | "claimed";
+  onClick: () => void;
+  isPending: boolean;
+}) => {
+  const { status } = useAccount();
+  const { open } = useWeb3Modal();
   return (
     <Button
       onClick={() => {
-        if (session.status === "unauthenticated") {
-          open();
+        if (status === "disconnected") {
+          return open();
         }
+        onClick();
       }}
+      disabled={
+        status === "connecting" || claimStatus !== "started" || isPending
+      }
       className="rounded-none text-lg font-bold italic"
     >
-      Claim
+      {status === "connecting"
+        ? "Connecting..."
+        : isPending
+          ? "Claiming..."
+          : {
+              "not started": "Coming Soon",
+              started: "Whitelist",
+              ended: "Ended",
+              claimed: "Claimed",
+            }[claimStatus]}
     </Button>
   );
 };

@@ -1,6 +1,6 @@
 export const formatTimerFromNow = (endDate: Date): string => {
   const now = Date.now();
-  const diff = endDate.getTime() - now;
+  const diff = Math.abs(endDate.getTime() - now);
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);

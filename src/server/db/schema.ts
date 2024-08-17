@@ -1,6 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
   index,
+  integer,
+  jsonb,
   pgTableCreator,
   primaryKey,
   serial,
@@ -34,11 +36,12 @@ export const wallets = createTable(
   }),
 );
 
-export const walletRelations = relations(wallets, ({ one }) => ({
+export const walletRelations = relations(wallets, ({ one, many }) => ({
   user: one(users, {
     fields: [wallets.userId],
     references: [users.id],
   }),
+  airdropCampaign: many(campaignWhitelistedWallets),
 }));
 
 export const users = createTable(
@@ -96,5 +99,68 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  }),
+);
+
+export const airdropCampaigns = createTable("airdrop_campaign", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
+  address: varchar("address", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  href: varchar("href", { length: 255 }).notNull().default("#"),
+  logo: varchar("logo", { length: 255 }),
+  token: varchar("token", { length: 255 }).notNull(),
+  startTime: timestamp("start_time", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  endTime: timestamp("end_time", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  totalStaked: integer("total_staked").notNull().default(0),
+  requirements: jsonb("requirements"),
+});
+
+export const airdropCampaignRelations = relations(
+  airdropCampaigns,
+  ({ many }) => ({
+    whitelistedUsers: many(campaignWhitelistedWallets),
+  }),
+);
+
+export const campaignWhitelistedWallets = createTable(
+  "campaign_whitelisted_wallet",
+  {
+    walletId: varchar("walletId", { length: 36 })
+      .notNull()
+      .references(() => wallets.id),
+    airdropCampaignId: varchar("airdrop_campaign_id", { length: 36 })
+      .notNull()
+      .references(() => airdropCampaigns.id),
+    createdAt: timestamp("created_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.walletId, table.airdropCampaignId] }),
+  }),
+);
+
+export const campaignWhitelistedUsersRelations = relations(
+  campaignWhitelistedWallets,
+  ({ one }) => ({
+    wallet: one(wallets, {
+      fields: [campaignWhitelistedWallets.walletId],
+      references: [wallets.id],
+    }),
+    airdropCampaign: one(airdropCampaigns, {
+      fields: [campaignWhitelistedWallets.airdropCampaignId],
+      references: [airdropCampaigns.id],
+    }),
   }),
 );

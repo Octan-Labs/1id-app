@@ -2,24 +2,20 @@
 import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Profile } from "./_components/Profile";
-import { SessionProvider, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import { Reputation } from "./_components/Reputation";
+import { useAccount } from "wagmi";
 
 export default function Page() {
-  return (
-    <SessionProvider>
-      <Dashboard />
-    </SessionProvider>
-  );
+  return <Dashboard />;
 }
 
 const Dashboard = () => {
-  const session = useSession();
+  const { isConnected } = useAccount();
   const { data: me } = api.user.me.useQuery();
   return (
     <>
-      {session.status !== "unauthenticated" ? (
+      {isConnected ? (
         <div>
           <div className="grid gap-6">
             <div className="flex flex-col gap-2">

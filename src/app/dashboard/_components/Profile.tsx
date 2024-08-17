@@ -99,6 +99,7 @@ const EmailInput = ({ email }: { email: string }) => {
         id="email"
         placeholder="Enter Your Email"
         value={newEmail}
+        disabled={isPending}
         onChange={(e) => setNewEmail(e.target.value)}
       />
       <Button

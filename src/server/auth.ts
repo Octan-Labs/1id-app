@@ -89,9 +89,6 @@ export const authOptions: NextAuthOptions = {
           const address = getAddressFromMessage(message);
           const chainId = getChainIdFromMessage(message);
 
-          console.log("address", address);
-          console.log("chainId", chainId);
-
           const isValid = await verifySignature({
             address,
             message,
@@ -105,14 +102,11 @@ export const authOptions: NextAuthOptions = {
               where: eq(wallets.address, address),
             });
 
-            console.log("existingWallet", existingWallet);
-
             if (!existingWallet) {
               const newWallet: typeof wallets.$inferInsert = {
                 address,
                 chainId,
               };
-              console.log("newWallet", newWallet);
               await db.insert(wallets).values(newWallet);
             }
 

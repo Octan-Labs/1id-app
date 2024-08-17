@@ -3,7 +3,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { cookieStorage, createStorage, http } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { bsc } from "wagmi/chains";
 import { env } from "~/env";
 
 // Create a metadata object
@@ -15,10 +15,10 @@ const metadata = {
 };
 
 // Create wagmiConfig
-const chains = [mainnet, sepolia] as const;
+const chains = [bsc] as const;
 export const wagmiConfig = defaultWagmiConfig({
   chains,
-  transports: { [mainnet.id]: http(), [sepolia.id]: http() },
+  transports: { [bsc.id]: http() },
   projectId: env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   metadata,
   ssr: true,

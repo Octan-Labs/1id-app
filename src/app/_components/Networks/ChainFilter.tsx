@@ -20,33 +20,13 @@ import {
 } from "~/components/ui/popover";
 
 const chains = [
-  {
-    value: "ETH",
-    label: "Ethereum",
-  },
+  // {
+  //   value: "ETH",
+  //   label: "Ethereum",
+  // },
   {
     value: "BSC",
-    label: "Binance Smart Chain",
-  },
-  {
-    value: "POL",
-    label: "Polygon",
-  },
-  {
-    value: "AVAX",
-    label: "Avalanche",
-  },
-  {
-    value: "FTM",
-    label: "Fantom",
-  },
-  {
-    value: "SOL",
-    label: "Solana",
-  },
-  {
-    value: "HEC",
-    label: "Heco",
+    label: "BNB",
   },
 ];
 
@@ -74,9 +54,9 @@ export function ChainFilter() {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search chains..." />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No chain found.</CommandEmpty>
             <CommandGroup>
               {chains.map((chain) => (
                 <CommandItem
