@@ -10,7 +10,6 @@ import { CountDownTimer } from "./CountDownTimer";
 import { middleEllipsis } from "../../../lib/stringUtils";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
-import { toPercent } from "~/lib/numberUtils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import Link from "next/link";
 import { SquareArrowOutUpRight } from "lucide-react";

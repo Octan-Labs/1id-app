@@ -28,7 +28,13 @@ export const CountDownTimer = ({
         {format(endTime, "dd/MM/yyyy hh:mm")}
       </div>
       <div suppressHydrationWarning>
-        {now < startTime ? "Starts in" : "Ends in"}: {distanceFromNow}
+        {now > endTime ? (
+          "Ended"
+        ) : (
+          <span>
+            {now < startTime ? "Starts in" : "Ends in"} : {distanceFromNow}
+          </span>
+        )}
       </div>
     </div>
   );
