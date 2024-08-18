@@ -105,7 +105,6 @@ const EmailInput = ({ email }: { email: string }) => {
       <Button
         className="w-fit rounded-none text-xl font-semibold italic"
         onClick={() => {
-          console.log(newEmail);
           mutate({ email: newEmail || "" });
         }}
       >

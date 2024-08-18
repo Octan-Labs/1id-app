@@ -51,6 +51,7 @@ export const NetworkCard = ({
 
   const claimToken = () => {
     mutate({ campaignId });
+    api.campaign.allCampaigns.useQuery().refetch();
   };
 
   return (

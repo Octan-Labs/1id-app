@@ -51,10 +51,6 @@ export const Networks = () => {
     refetch();
   }, [isConnected, refetch]);
 
-  useEffect(() => {
-    console.log("data", data);
-  }, [data]);
-
   const filteredNetworks = useMemo(
     () =>
       data?.filter((network) => {

@@ -11,6 +11,7 @@ import {
   wallets,
 } from "~/server/db/schema";
 import { z } from "zod";
+import { db } from "~/server/db";
 // id: varchar("id", { length: 36 })
 //   .primaryKey()
 //   .$defaultFn(() => uuidv7()),
@@ -33,10 +34,16 @@ import { z } from "zod";
 export const campaignRouter = createTRPCRouter({
   //TODO: Add filter for ongoing campaigns later if required
   allCampaigns: publicProcedure.query(async ({ ctx }) => {
-    const wallet = await ctx.db.query.wallets.findFirst({
-      where: eq(wallets.address, ctx.session?.address ?? ""),
-    });
-
+    const subquery = db
+      .select()
+      .from(campaignWhitelistedWallets)
+      .where(
+        eq(
+          campaignWhitelistedWallets.walletAddress,
+          ctx.session?.address ?? "",
+        ),
+      )
+      .as("subquery");
     const campaigns = await ctx.db
       .select({
         campaignId: airdropCampaigns.id,
@@ -49,23 +56,18 @@ export const campaignRouter = createTRPCRouter({
         endTime: airdropCampaigns.endTime,
         totalStaked: airdropCampaigns.totalStaked,
         requirements: airdropCampaigns.requirements,
-        claimed: wallets.address,
+        claimed: subquery.walletAddress,
       })
       .from(airdropCampaigns)
       .leftJoin(
-        campaignWhitelistedWallets,
-        and(
-          eq(airdropCampaigns.id, campaignWhitelistedWallets.airdropCampaignId),
-          or(
-            isNull(campaignWhitelistedWallets.walletId),
-            eq(campaignWhitelistedWallets.walletId, wallet?.id ?? ""),
-          ),
+        subquery,
+        or(
+          eq(airdropCampaigns.id, subquery.airdropCampaignId),
+          isNull(subquery.walletAddress),
         ),
       )
-      .leftJoin(wallets, eq(campaignWhitelistedWallets.walletId, wallets.id))
       .orderBy(airdropCampaigns.endTime)
       .execute();
-    console.log(campaigns);
 
     return campaigns;
   }),
@@ -83,7 +85,7 @@ export const campaignRouter = createTRPCRouter({
       return await ctx.db
         .insert(campaignWhitelistedWallets)
         .values({
-          walletId: wallet?.id,
+          walletAddress: wallet?.address,
           airdropCampaignId: input.campaignId,
         })
         .returning()

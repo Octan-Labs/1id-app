@@ -23,10 +23,7 @@ export const createTable = pgTableCreator((name) => `1id_${name}`);
 export const wallets = createTable(
   "wallet",
   {
-    id: varchar("id", { length: 36 })
-      .primaryKey()
-      .$defaultFn(() => uuidv7()),
-    address: varchar("address", { length: 255 }).notNull().unique(),
+    address: varchar("address", { length: 255 }).primaryKey(),
     userId: varchar("user_id", { length: 36 }).references(() => users.id),
     chainId: varchar("chain_id", { length: 255 }).notNull(),
   },
@@ -133,9 +130,9 @@ export const airdropCampaignRelations = relations(
 export const campaignWhitelistedWallets = createTable(
   "campaign_whitelisted_wallet",
   {
-    walletId: varchar("walletId", { length: 36 })
+    walletAddress: varchar("wallet_address", { length: 255 })
       .notNull()
-      .references(() => wallets.id),
+      .references(() => wallets.address),
     airdropCampaignId: varchar("airdrop_campaign_id", { length: 36 })
       .notNull()
       .references(() => airdropCampaigns.id),
@@ -147,7 +144,7 @@ export const campaignWhitelistedWallets = createTable(
       .default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.walletId, table.airdropCampaignId] }),
+    pk: primaryKey({ columns: [table.walletAddress, table.airdropCampaignId] }),
   }),
 );
 
@@ -155,8 +152,8 @@ export const campaignWhitelistedUsersRelations = relations(
   campaignWhitelistedWallets,
   ({ one }) => ({
     wallet: one(wallets, {
-      fields: [campaignWhitelistedWallets.walletId],
-      references: [wallets.id],
+      fields: [campaignWhitelistedWallets.walletAddress],
+      references: [wallets.address],
     }),
     airdropCampaign: one(airdropCampaigns, {
       fields: [campaignWhitelistedWallets.airdropCampaignId],
