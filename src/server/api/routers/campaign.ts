@@ -56,9 +56,9 @@ export const campaignRouter = createTRPCRouter({
         wallets,
         and(
           eq(campaignWhitelistedWallets.walletId, wallets.id),
-          eq(wallets.address, ctx.session?.address || ""),
+          eq(wallets.address, ctx.session?.address ?? ""),
         ),
-      )
+      ).orderBy(airdropCampaigns.endTime)
       .execute();
     console.log(campaigns);
 

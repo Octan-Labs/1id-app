@@ -38,9 +38,9 @@ import { useAccount } from "wagmi";
 // ];
 
 export const Networks = () => {
-  const [listing, setListing] = useState<"on-going" | "ended" | "coming-soon">(
-    "on-going",
-  );
+  const [listing, setListing] = useState<
+    "all" | "on-going" | "ended" | "coming-soon"
+  >("all");
   const { data, refetch } = api.campaign.allCampaigns.useQuery();
   const { isConnected } = useAccount();
 
@@ -76,7 +76,7 @@ export const Networks = () => {
         }
         if (listing === "coming-soon") {
           return (
-            (network.startTime && network.startTime > new Date()) ||
+            (network.startTime && network.startTime > new Date()) ??
             !network.totalStaked
           );
         }
@@ -93,7 +93,13 @@ export const Networks = () => {
           className="rounded-full text-xl font-bold italic"
           variant={listing === "on-going" ? "outline" : "primary-active"}
           shadow={listing === "on-going" ? "default" : "onHover"}
-          onClick={() => setListing("on-going")}
+          onClick={() => {
+            if (listing === "on-going") {
+              setListing("all");
+            } else {
+              setListing("on-going");
+            }
+          }}
         >
           On-going
         </Button>
@@ -101,7 +107,13 @@ export const Networks = () => {
           className="rounded-full text-xl font-bold italic"
           variant={listing === "ended" ? "outline" : "primary-active"}
           shadow={listing === "ended" ? "default" : "onHover"}
-          onClick={() => setListing("ended")}
+          onClick={() => {
+            if (listing === "ended") {
+              setListing("all");
+            } else {
+              setListing("ended");
+            }
+          }}
         >
           Expired
         </Button>
@@ -109,7 +121,13 @@ export const Networks = () => {
           className="rounded-full text-xl font-bold italic"
           variant={listing === "coming-soon" ? "outline" : "primary-active"}
           shadow={listing === "coming-soon" ? "default" : "onHover"}
-          onClick={() => setListing("coming-soon")}
+          onClick={() => {
+            if (listing === "coming-soon") {
+              setListing("all");
+            } else {
+              setListing("coming-soon");
+            }
+          }}
         >
           Coming Soon
         </Button>

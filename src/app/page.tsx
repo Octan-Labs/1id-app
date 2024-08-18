@@ -7,7 +7,7 @@ export default function Home() {
         <div className="grid gap-2">
           <h1 className="text-5xl font-[900] uppercase italic">Airdrop</h1>
           <h2 className="leading-6 text-black">
-            Got potential? Money's yours to get, no sweat
+            Got potential? Money&apos;s yours to get, no sweat
             <br />
             Claim 1 & Get 1 free
           </h2>
