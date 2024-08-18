@@ -1,4 +1,4 @@
-import { eq, isNull, or, and } from "drizzle-orm";
+import { eq, isNull, or, and, Subquery } from "drizzle-orm";
 
 import {
   createTRPCRouter,
@@ -33,6 +33,10 @@ import { z } from "zod";
 export const campaignRouter = createTRPCRouter({
   //TODO: Add filter for ongoing campaigns later if required
   allCampaigns: publicProcedure.query(async ({ ctx }) => {
+    const wallet = await ctx.db.query.wallets.findFirst({
+      where: eq(wallets.address, ctx.session?.address ?? ""),
+    });
+
     const campaigns = await ctx.db
       .select({
         campaignId: airdropCampaigns.id,
@@ -50,15 +54,16 @@ export const campaignRouter = createTRPCRouter({
       .from(airdropCampaigns)
       .leftJoin(
         campaignWhitelistedWallets,
-        eq(airdropCampaigns.id, campaignWhitelistedWallets.airdropCampaignId),
-      )
-      .leftJoin(
-        wallets,
         and(
-          eq(campaignWhitelistedWallets.walletId, wallets.id),
-          eq(wallets.address, ctx.session?.address ?? ""),
+          eq(airdropCampaigns.id, campaignWhitelistedWallets.airdropCampaignId),
+          or(
+            isNull(campaignWhitelistedWallets.walletId),
+            eq(campaignWhitelistedWallets.walletId, wallet?.id ?? ""),
+          ),
         ),
-      ).orderBy(airdropCampaigns.endTime)
+      )
+      .leftJoin(wallets, eq(campaignWhitelistedWallets.walletId, wallets.id))
+      .orderBy(airdropCampaigns.endTime)
       .execute();
     console.log(campaigns);
 
