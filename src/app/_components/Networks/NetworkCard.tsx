@@ -185,7 +185,7 @@ const ClaimButton = ({
               "not started": "Coming Soon",
               started: "Whitelist",
               ended: "Ended",
-              claimed: "Claimed",
+              claimed: "Whitelisted",
             }[claimStatus]}
     </Button>
   );
