@@ -46,12 +46,17 @@ export const NetworkCard = ({
   claimed,
 }: NetworkCardProps) => {
   const now = new Date();
-  const { mutate, isPending, isSuccess } =
-    api.campaign.whitelistWallet.useMutation();
 
-  const claimToken = () => {
+  const { refetch } = api.campaign.allCampaigns.useQuery();
+  const { mutate, isPending, isSuccess } =
+    api.campaign.whitelistWallet.useMutation({
+      onSuccess: () => {
+        refetch();
+      },
+    });
+
+  const claimToken = async () => {
     mutate({ campaignId });
-    api.campaign.allCampaigns.useQuery().refetch();
   };
 
   return (

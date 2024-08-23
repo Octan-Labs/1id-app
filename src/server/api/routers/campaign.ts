@@ -1,4 +1,4 @@
-import { eq, isNull, or, and, Subquery } from "drizzle-orm";
+import { eq, isNull, or, and, gte } from "drizzle-orm";
 
 import {
   createTRPCRouter,
@@ -67,6 +67,7 @@ export const campaignRouter = createTRPCRouter({
         ),
       )
       .orderBy(airdropCampaigns.endTime)
+      .where(isNull(airdropCampaigns.deletedAt))
       .execute();
 
     return campaigns;
@@ -81,7 +82,18 @@ export const campaignRouter = createTRPCRouter({
       const wallet = await ctx.db.query.wallets.findFirst({
         where: eq(wallets.address, ctx.session?.address),
       });
-      if (!wallet) return;
+      if (!wallet) throw new Error("Wallet not found");
+      const eligibleCampaigns = await ctx.db.query.airdropCampaigns.findFirst({
+        where: and(
+          eq(airdropCampaigns.id, input.campaignId),
+          or(
+            isNull(airdropCampaigns.endTime),
+            gte(airdropCampaigns.endTime, new Date()),
+          ),
+          isNull(airdropCampaigns.deletedAt),
+        ),
+      });
+      if (!eligibleCampaigns) throw new Error("Campaign not found");
       return await ctx.db
         .insert(campaignWhitelistedWallets)
         .values({

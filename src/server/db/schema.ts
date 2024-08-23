@@ -1,7 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  bigint,
   index,
-  integer,
   jsonb,
   pgTableCreator,
   primaryKey,
@@ -24,7 +24,9 @@ export const wallets = createTable(
   "wallet",
   {
     address: varchar("address", { length: 255 }).primaryKey(),
-    userId: varchar("user_id", { length: 36 }).references(() => users.id),
+    userId: varchar("user_id", { length: 36 }).references(() => users.id, {
+      onDelete: "cascade",
+    }),
     chainId: varchar("chain_id", { length: 255 }).notNull(),
   },
   (table) => ({
@@ -69,7 +71,7 @@ export const userProfiles = createTable(
   {
     id: serial("id").primaryKey(),
     userId: varchar("user_id", { length: 36 })
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: "cascade" })
       .unique(),
   },
   (table) => ({
@@ -116,8 +118,14 @@ export const airdropCampaigns = createTable("airdrop_campaign", {
     mode: "date",
     withTimezone: true,
   }),
-  totalStaked: integer("total_staked").notNull().default(0),
+  totalStaked: bigint("total_staked", { mode: "bigint" })
+    .notNull()
+    .default(sql`0`),
   requirements: jsonb("requirements"),
+  deletedAt: timestamp("deleted_at", {
+    mode: "date",
+    withTimezone: true,
+  }),
 });
 
 export const airdropCampaignRelations = relations(
@@ -132,16 +140,16 @@ export const campaignWhitelistedWallets = createTable(
   {
     walletAddress: varchar("wallet_address", { length: 255 })
       .notNull()
-      .references(() => wallets.address),
+      .references(() => wallets.address, { onDelete: "cascade" }),
     airdropCampaignId: varchar("airdrop_campaign_id", { length: 36 })
       .notNull()
-      .references(() => airdropCampaigns.id),
+      .references(() => airdropCampaigns.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", {
       mode: "date",
       withTimezone: true,
     })
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+      .defaultNow(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.walletAddress, table.airdropCampaignId] }),
