@@ -1,6 +1,7 @@
 // src/db/seed.ts
 import { airdropCampaigns } from "./schema";
 import { db } from ".";
+import { exit } from "process";
 
 const main = async () => {
   const data: (typeof airdropCampaigns.$inferInsert)[] = [
@@ -67,3 +68,4 @@ const main = async () => {
 console.log("Seed start");
 await main();
 console.log("Seed done");
+exit();
