@@ -2,7 +2,7 @@
 import UnauthenticatedDashboard from "./_components/UnauthenticatedDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Profile } from "./_components/Profile";
-import { api } from "~/trpc/react";
+// import { api } from "~/trpc/react";
 import { Reputation } from "./_components/Reputation";
 import { useAccount } from "wagmi";
 
@@ -12,7 +12,7 @@ export default function Page() {
 
 const Dashboard = () => {
   const { isConnected } = useAccount();
-  const { data: me } = api.user.me.useQuery();
+  // const { data: me } = api.user.me.useQuery();
   return (
     <>
       {isConnected ? (
@@ -49,7 +49,7 @@ const Dashboard = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="profile">
-                  <Profile me={me?.user} />
+                  <Profile me={null} />
                 </TabsContent>
                 <TabsContent value="reputation">
                   <Reputation />

@@ -3,8 +3,6 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Skeleton } from "~/components/ui/skeleton";
-import { api } from "~/trpc/react";
 
 export const Profile = ({
   me,
@@ -35,17 +33,7 @@ export const Profile = ({
         </div>
         <div className="grid w-full gap-6">
           <div className="grid w-full items-center gap-3">
-            {me?.email ? (
-              <EmailInput email={me?.email ?? ""} />
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
-                </div>
-              </div>
-            )}
+              <EmailInput email={me?.email ?? "test@example.com"} />
           </div>
           <div className="grid w-full items-center gap-6">
             <div className="grid gap-1.5">
@@ -89,7 +77,7 @@ export const Profile = ({
 };
 
 const EmailInput = ({ email }: { email: string }) => {
-  const { mutate, isPending } = api.user.verifyEmail.useMutation();
+  // const { mutate, isPending } = api.user.verifyEmail.useMutation();
   const [newEmail, setNewEmail] = useState(email);
   return (
     <>
@@ -99,16 +87,19 @@ const EmailInput = ({ email }: { email: string }) => {
         id="email"
         placeholder="Enter Your Email"
         value={newEmail}
-        disabled={isPending}
+        // disabled={isPending}
         onChange={(e) => setNewEmail(e.target.value)}
       />
       <Button
         className="w-fit rounded-none text-xl font-semibold italic"
         onClick={() => {
-          mutate({ email: newEmail || "" });
+          // mutate({ email: newEmail || "" });
         }}
       >
-        {isPending ? "Sending..." : "Send a code"}
+        {
+          // {isPending ? "Sending..." : "Send a code"}
+        }
+        Send a code
       </Button>
     </>
   );

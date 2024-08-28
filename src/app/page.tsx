@@ -20,7 +20,8 @@ export default function Home() {
           />
         </div>
       </div>
-        <Networks />
+      <Networks />
     </div>
   );
 }
+export const dynamic = "force-static";

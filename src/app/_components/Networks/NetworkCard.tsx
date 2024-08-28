@@ -47,17 +47,17 @@ export const NetworkCard = ({
 }: NetworkCardProps) => {
   const now = new Date();
 
-  const { refetch } = api.campaign.allCampaigns.useQuery();
-  const { mutate, isPending, isSuccess } =
-    api.campaign.whitelistWallet.useMutation({
-      onSuccess: () => {
-        refetch();
-      },
-    });
+  // const { refetch } = api.campaign.allCampaigns.useQuery();
+  // const { mutate, isPending, isSuccess } =
+  //   api.campaign.whitelistWallet.useMutation({
+  //     onSuccess: () => {
+  //       refetch();
+  //     },
+  //   });
 
-  const claimToken = async () => {
-    mutate({ campaignId });
-  };
+  // const claimToken = async () => {
+  //   mutate({ campaignId });
+  // };
 
   return (
     <Card>
@@ -140,18 +140,16 @@ export const NetworkCard = ({
         </span>
         <ClaimButton
           claimStatus={
-            isSuccess || claimed
-              ? "claimed"
-              : startTime && endTime
-                ? now < startTime
-                  ? "not started"
-                  : endTime < now
-                    ? "ended"
-                    : "started"
-                : "not started"
+            startTime && endTime
+              ? now < startTime
+                ? "not started"
+                : endTime < now
+                  ? "ended"
+                  : "started"
+              : "not started"
           }
-          isPending={isPending}
-          onClick={claimToken}
+          isPending={false}
+          onClick={() => null}
         />
       </CardFooter>
     </Card>

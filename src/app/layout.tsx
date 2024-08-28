@@ -6,10 +6,8 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import Web3ModalProvider from "./context/Web3Modal";
 import { cookieToInitialState } from "wagmi";
-import { headers } from "next/headers";
 import { wagmiConfig } from "~/config/wagmi";
 import { Layout } from "./_components/layout";
-import { HydrateClient } from "~/trpc/server";
 
 const GTWalsheimPro = localfont({
   src: [
@@ -110,20 +108,13 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const initialState = cookieToInitialState(
-    wagmiConfig,
-    headers().get("cookie"),
-  );
+  const initialState = cookieToInitialState(wagmiConfig);
   return (
     <html lang="en" className={`${GTWalsheimPro.className}`}>
       <body>
         <Web3ModalProvider initialState={initialState}>
-          <TRPCReactProvider>
-            <HydrateClient>
-              <div className="font-semibold"></div>
-                <Layout>{children}</Layout>
-            </HydrateClient>
-          </TRPCReactProvider>
+          <div className="font-semibold"></div>
+          <Layout>{children}</Layout>
         </Web3ModalProvider>
       </body>
     </html>

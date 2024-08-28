@@ -9,8 +9,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "pnpx tsx --env-file=.env ./src/server/db/seed.ts",
-    "dev": "next dev --turbo",
+    "db:seed": "pnpx tsx --env-file=./.env ./src/server/db/seed.ts",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "lint": "next lint",
     "start": "next start"
   },
